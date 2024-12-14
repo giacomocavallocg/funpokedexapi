@@ -193,6 +193,7 @@ publish/
 # checkin your Azure Web App publish settings, but sensitive information contained
 # in these scripts will be unencrypted
 PublishScripts/
+appsettings.*.json
 
 # NuGet Packages
 *.nupkg
@@ -398,3 +399,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
