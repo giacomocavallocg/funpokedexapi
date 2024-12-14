@@ -9,6 +9,6 @@ namespace FunPokedex.Application.Interfaces
 {
     public interface IFunPokedexService
     {
-        public PokedexResult<string> GetFunDescription(Pokemon pokemon);
+        public Task<PokedexResult<string>> GetFunDescription(Pokemon pokemon);
     }
 }
