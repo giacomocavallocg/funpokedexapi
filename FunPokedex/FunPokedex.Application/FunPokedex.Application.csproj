@@ -9,5 +9,8 @@
   <ItemGroup>
     <Folder Include="Services\" />
   </ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="FunPokedex.Tests" />
+	</ItemGroup>
 
 </Project>
