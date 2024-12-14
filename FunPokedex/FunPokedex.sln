@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunPokedex.Api", "FunPokedex.Api\FunPokedex.Api.csproj", "{9B5E5DE1-7224-479A-8F0A-6F651142F5C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunPokedex.Application", "FunPokedex.Application\FunPokedex.Application.csproj", "{9995BE76-69D2-49A8-AFB3-182D95DA8C5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{9B5E5DE1-7224-479A-8F0A-6F651142F5C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B5E5DE1-7224-479A-8F0A-6F651142F5C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B5E5DE1-7224-479A-8F0A-6F651142F5C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9995BE76-69D2-49A8-AFB3-182D95DA8C5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9995BE76-69D2-49A8-AFB3-182D95DA8C5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9995BE76-69D2-49A8-AFB3-182D95DA8C5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9995BE76-69D2-49A8-AFB3-182D95DA8C5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
