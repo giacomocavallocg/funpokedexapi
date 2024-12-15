@@ -16,9 +16,9 @@ namespace FunPokedex.Api.Controllers
 
 
         [HttpGet("{pokemonName}")]
-        public async Task<ActionResult<PokemonDto>> GetPokemon([BindRequired, FromRoute] string pokemonName)
+        public async Task<ActionResult<PokemonDto>> GetPokemon([BindRequired, FromRoute] string pokemonName, CancellationToken cancellationToken)
         {
-            PokedexResult<Pokemon> result = await _pokedexService.GetPokemon(pokemonName);
+            PokedexResult<Pokemon> result = await _pokedexService.GetPokemon(pokemonName, cancellationToken);
 
             if (!result.IsSuccess)
                 return HandleFailResult(result);
@@ -36,16 +36,16 @@ namespace FunPokedex.Api.Controllers
         }
 
         [HttpGet("/translated/{pokemonName}")]
-        public async Task<ActionResult<PokemonDto>> GetPokemonTranslated([BindRequired, FromRoute] string pokemonName)
+        public async Task<ActionResult<PokemonDto>> GetPokemonTranslated([BindRequired, FromRoute] string pokemonName, CancellationToken cancellationToken)
         {
-            PokedexResult<Pokemon> result = await _pokedexService.GetPokemon(pokemonName);
+            PokedexResult<Pokemon> result = await _pokedexService.GetPokemon(pokemonName, cancellationToken);
 
             if (!result.IsSuccess)
                 return HandleFailResult(result);
 
             Pokemon pokemon = result.GetValueOrThrow();
 
-            PokedexResult<string> funTraslation = await _funService.GetFunDescription(pokemon);
+            PokedexResult<string> funTraslation = await _funService.GetFunDescription(pokemon, cancellationToken);
 
             return new PokemonDto()
             {
