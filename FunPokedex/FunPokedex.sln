@@ -1,13 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunPokedex.Api", "FunPokedex.Api\FunPokedex.Api.csproj", "{9B5E5DE1-7224-479A-8F0A-6F651142F5C4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunPokedex.Application", "FunPokedex.Application\FunPokedex.Application.csproj", "{9995BE76-69D2-49A8-AFB3-182D95DA8C5B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunPokedex.Tests", "FunPokedex.Test\FunPokedex.Tests.csproj", "{A1B5AD11-AC94-492F-96A0-4357CD227AC7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementi di soluzione", "Elementi di soluzione", "{D2B7B918-86E9-4DF7-9B61-BAED41BACE1B}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		Dockerfile = Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
