@@ -1,10 +1,12 @@
 ﻿
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace FunPokedex.Application.Models
 {
     internal record PokemonSpecieDto
     {
-        public required string Id { get; set; }
+        public required int Id { get; set; }
 
         public required string Name { get; set; }
 
@@ -25,3 +27,4 @@ namespace FunPokedex.Application.Models
         public required string Language { get; set; }
     }
 }
+

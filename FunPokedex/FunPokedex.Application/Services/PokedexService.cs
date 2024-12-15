@@ -11,13 +11,13 @@ namespace FunPokedex.Application.Services
         private readonly IPokeApi _pokeApi = pokeApi;
         private readonly IApplicationCache _cache = cache;
 
-        public async Task<PokedexResult<Pokemon>> GetPokemon(string name)
+        public async Task<PokedexResult<Pokemon>> GetPokemon(string name, CancellationToken token)
         {
 
             if (_cache.TryGetValue(GetCacheKey(name), out Pokemon? cachePokemon))
                 return PokedexResult<Pokemon>.Success(cachePokemon!);
 
-            PokemonSpecieDto? specie = await _pokeApi.GetPokemonSpecies(name);
+            PokemonSpecieDto? specie = await _pokeApi.GetPokemonSpecies(name, token);
 
             if (specie == null) return PokedexResult<Pokemon>.Fail($"species {name} not found", FailureType.NotFound);
 

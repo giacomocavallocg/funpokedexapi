@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FunPokedex.Application.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace FunPokedex.Application.Infrastructure
 {
-    public class ApplicationMemoryCache
+    public class ApplicationMemoryCache: IApplicationCache
     {
 
         private readonly IMemoryCache _memoryCache;

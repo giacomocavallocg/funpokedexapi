@@ -9,6 +9,6 @@ namespace FunPokedex.Application.Interfaces
 {
     public interface IPokedexService
     {
-        public Task<PokedexResult<Pokemon>> GetPokemon(string name);
+        public Task<PokedexResult<Pokemon>> GetPokemon(string name, CancellationToken token);
     }
 }
