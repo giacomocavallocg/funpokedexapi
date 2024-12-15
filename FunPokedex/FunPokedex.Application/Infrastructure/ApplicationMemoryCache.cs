@@ -7,11 +7,23 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace FunPokedex.Application.Infrastructure
 {
-    public class ApplicationMemoryCache(IMemoryCache memoryCache, TimeSpan entryDuration)
+    public class ApplicationMemoryCache
     {
 
-        private readonly IMemoryCache _memoryCache = memoryCache;
-        private readonly TimeSpan _entryDuration = entryDuration;
+        private readonly IMemoryCache _memoryCache;
+        private readonly MemoryCacheEntryOptions _cacheOptions;
+
+        public ApplicationMemoryCache(IMemoryCache memoryCache, TimeSpan entryDuration)
+        {
+            _memoryCache = memoryCache;
+            _cacheOptions = new MemoryCacheEntryOptions();
+
+            if (entryDuration.TotalMicroseconds >= 1)
+            {
+                _cacheOptions.SetSlidingExpiration(entryDuration);
+            }
+
+        }
 
 
         public bool TryGetValue<T>(string key, out T? value)
@@ -29,10 +41,7 @@ namespace FunPokedex.Application.Infrastructure
 
         public void SetValue<T>(string key, T value)
         {
-            MemoryCacheEntryOptions cacheOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(_entryDuration);
-
-            _memoryCache.Set(key, value);
+            _memoryCache.Set(key, value, _cacheOptions);
         }
     }
 }
