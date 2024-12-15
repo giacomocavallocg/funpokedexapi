@@ -25,7 +25,7 @@ From Visual Studio, you can:
 - Start the application using `Debug > Run`
 - Run tests using `Test > Run All Tests`
 
-If you choose the `https` startup configuration, the application will be listening on `https://localhost:7061`.
+If you choose the `http` startup configuration, the application will be listening on `http://localhost:5000`.
 
 Alternatively, you can run the application from the command line. Navigate to the `/FunPokedex` directory and run the following commands:
 
