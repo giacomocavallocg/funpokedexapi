@@ -24,7 +24,7 @@ namespace FunPokedex.Application.Services
             Pokemon pokemon = new()
             {
                 Name = specie.Name,
-                Description = specie.FlavorTexts.FirstOrDefault(d => d.Language == "en")?.FlavorText ?? "",
+                Description = specie.FlavorTexts.FirstOrDefault(d => d.Language == "en")?.FlavorText ?? String.Empty,
                 Habitat = specie.Habitat,
                 IsLegendary = specie.IsLegendary,
             };
