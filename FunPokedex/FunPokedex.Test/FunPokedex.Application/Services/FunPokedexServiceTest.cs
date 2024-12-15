@@ -15,22 +15,24 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
 
         private readonly Mock<IFunTranslationsApi> _translationsApiMock;
         private readonly Mock<IApplicationCache> _cacheMock;
+        private readonly CancellationToken _token;
 
         public FunPokedexServiceTest() 
         { 
             _translationsApiMock = new Mock<IFunTranslationsApi>();
             _cacheMock = new Mock<IApplicationCache>();
+            _token = new CancellationToken();
         }
 
         [Fact]
         public async Task GetFunDescription_OK()
         {
 
-            _translationsApiMock.Setup(s => s.GetShakespeareTranslation(It.IsAny<string>())).ReturnsAsync(
-                new FunTranslationDto() { Translation = "shakspeare", OriginalText = "original" });
+            _translationsApiMock.Setup(s => s.GetShakespeareTranslation(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(
+                new FunTranslationDto() { Translation = "shakspeare", OriginalText = "original", Origin = "shakspeare" });
 
-            _translationsApiMock.Setup(s => s.GetYodaTranslation(It.IsAny<string>())).ReturnsAsync(
-                new FunTranslationDto() { Translation = "yoda", OriginalText = "original" });
+            _translationsApiMock.Setup(s => s.GetYodaTranslation(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(
+                new FunTranslationDto() { Translation = "yoda", OriginalText = "original", Origin = "yoda" });
 
 
             FunPokedexService service = new(_translationsApiMock.Object, _cacheMock.Object);
@@ -44,7 +46,7 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = false,
             };
 
-            var result = await service.GetFunDescription(pokemon);
+            var result = await service.GetFunDescription(pokemon, _token);
 
             Assert.True(result.IsSuccess);
             Assert.Equal("yoda", result.Value);
@@ -58,7 +60,7 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = true,
             };
 
-            result = await service.GetFunDescription(pokemon);
+            result = await service.GetFunDescription(pokemon, _token);
 
             Assert.True(result.IsSuccess);
             Assert.Equal("yoda", result.Value);
@@ -72,7 +74,7 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = false,
             };
 
-            result = await service.GetFunDescription(pokemon);
+            result = await service.GetFunDescription(pokemon, _token);
 
             Assert.True(result.IsSuccess);
             Assert.Equal("shakspeare", result.Value);
@@ -96,21 +98,21 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = false,
             };
 
-            var result = await service.GetFunDescription(pokemon);
+            var result = await service.GetFunDescription(pokemon, _token);
 
             Assert.True(result.IsSuccess);
             Assert.Equal(desc, result.Value);
 
-            _translationsApiMock.Verify(t => t.GetYodaTranslation(It.IsAny<string>()), Times.Never());
-            _translationsApiMock.Verify(t => t.GetShakespeareTranslation(It.IsAny<string>()), Times.Never());
+            _translationsApiMock.Verify(t => t.GetYodaTranslation(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+            _translationsApiMock.Verify(t => t.GetShakespeareTranslation(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
         }
 
         [Fact]
         public async Task GetFunDescription_OKNullTranslation()
         {
 
-            _translationsApiMock.Setup(s => s.GetShakespeareTranslation(It.IsAny<string>())).ReturnsAsync(() => null);
-            _translationsApiMock.Setup(s => s.GetYodaTranslation(It.IsAny<string>())).ReturnsAsync(() => null);
+            _translationsApiMock.Setup(s => s.GetShakespeareTranslation(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => null);
+            _translationsApiMock.Setup(s => s.GetYodaTranslation(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => null);
 
 
             FunPokedexService service = new(_translationsApiMock.Object, _cacheMock.Object);
@@ -124,7 +126,7 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = false,
             };
 
-            var result = await service.GetFunDescription(pokemon);
+            var result = await service.GetFunDescription(pokemon, _token);
 
             Assert.True(result.IsSuccess);
             Assert.Equal(pokemon.Description, result.Value);
@@ -138,7 +140,7 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = false,
             };
 
-            result = await service.GetFunDescription(pokemon);
+            result = await service.GetFunDescription(pokemon, _token);
 
             Assert.True(result.IsSuccess);
             Assert.Equal(pokemon.Description, result.Value);
@@ -148,8 +150,8 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
         public async Task GetFunDescription_TranslationException()
         {
 
-            _translationsApiMock.Setup(s => s.GetShakespeareTranslation(It.IsAny<string>())).ThrowsAsync(new Exception());
-            _translationsApiMock.Setup(s => s.GetYodaTranslation(It.IsAny<string>())).ThrowsAsync(new Exception());
+            _translationsApiMock.Setup(s => s.GetShakespeareTranslation(It.IsAny<string>(), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception());
+            _translationsApiMock.Setup(s => s.GetYodaTranslation(It.IsAny<string>(), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception());
 
 
             FunPokedexService service = new(_translationsApiMock.Object, _cacheMock.Object);
@@ -163,7 +165,7 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = false,
             };
 
-            await Assert.ThrowsAnyAsync<Exception>( () =>service.GetFunDescription(pokemon));
+            await Assert.ThrowsAnyAsync<Exception>( () =>service.GetFunDescription(pokemon, _token));
 
             // shakspeare
             pokemon = new()
@@ -174,7 +176,7 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = false,
             };
 
-            await Assert.ThrowsAnyAsync<Exception>(() => service.GetFunDescription(pokemon));
+            await Assert.ThrowsAnyAsync<Exception>(() => service.GetFunDescription(pokemon, _token));
 
         }
 
@@ -194,7 +196,7 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = false,
             };
 
-            await Assert.ThrowsAnyAsync<Exception>(() => service.GetFunDescription(pokemon));
+            await Assert.ThrowsAnyAsync<Exception>(() => service.GetFunDescription(pokemon, _token));
         }
 
     }

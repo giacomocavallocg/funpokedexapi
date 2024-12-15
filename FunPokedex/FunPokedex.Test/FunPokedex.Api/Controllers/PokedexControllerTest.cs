@@ -16,6 +16,15 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
     public class PokedexControllerTest
     {
 
+        private readonly Mock<IPokedexService> _pokedexServiceMock;
+        private readonly CancellationToken _token;
+
+        public PokedexControllerTest()
+        {
+            _pokedexServiceMock = new Mock<IPokedexService>();
+            _token = new CancellationToken();
+        }
+
         [Fact]
         public async Task GetPokemon_OK()
         {
@@ -27,12 +36,11 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
                 IsLegendary = true,
             };
 
-            var mockPokedexService = new Mock<IPokedexService>();
-            mockPokedexService.Setup(a => a.GetPokemon(pokemon.Name)).ReturnsAsync(PokedexResult<Pokemon>.Success(pokemon));
+            _pokedexServiceMock.Setup(a => a.GetPokemon(pokemon.Name, It.IsAny<CancellationToken>())).ReturnsAsync(PokedexResult<Pokemon>.Success(pokemon));
 
-            PokedexController controller = new(mockPokedexService.Object, new Mock<IFunPokedexService>().Object, MockedLogger);
+            PokedexController controller = new(_pokedexServiceMock.Object, new Mock<IFunPokedexService>().Object, MockedLogger);
 
-            var response = await controller.GetPokemon(pokemon.Name);
+            var response = await controller.GetPokemon(pokemon.Name, _token);
             Assert.NotNull(response.Value);
             Assert.IsType<PokemonDto>(response.Value);
             Assert.Equal(pokemon.Name, response.Value.Name);
@@ -40,7 +48,7 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
             Assert.Equal(pokemon.Habitat, response.Value.Habitat);
             Assert.Equal(pokemon.IsLegendary, response.Value.IsLegendary);
 
-            mockPokedexService.Verify(a => a.GetPokemon(pokemon.Name), Times.Once);
+            _pokedexServiceMock.Verify(a => a.GetPokemon(pokemon.Name, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -48,18 +56,17 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
         {
             string pokemonName = "not-exists";
 
-            var mockPokedexService = new Mock<IPokedexService>();
-            mockPokedexService.Setup(a => a.GetPokemon(pokemonName)).ReturnsAsync(PokedexResult<Pokemon>.Fail("not found", FailureType.NotFound));
+            _pokedexServiceMock.Setup(a => a.GetPokemon(pokemonName, It.IsAny<CancellationToken>())).ReturnsAsync(PokedexResult<Pokemon>.Fail("not found", FailureType.NotFound));
 
-            PokedexController controller = new (mockPokedexService.Object, new Mock<IFunPokedexService>().Object, MockedLogger);
-            var response = await controller.GetPokemon(pokemonName);
+            PokedexController controller = new (_pokedexServiceMock.Object, new Mock<IFunPokedexService>().Object, MockedLogger);
+            var response = await controller.GetPokemon(pokemonName, _token);
             Assert.IsType<NotFoundObjectResult>(response.Result);
             Assert.IsType<ErrorDto>(((NotFoundObjectResult)response.Result).Value);
 
             var dto = (ErrorDto) ((NotFoundObjectResult)response.Result).Value!;
             Assert.Equal("100", dto.Code);
 
-            mockPokedexService.Verify(a => a.GetPokemon(pokemonName), Times.Once);
+            _pokedexServiceMock.Verify(a => a.GetPokemon(pokemonName, It.IsAny<CancellationToken>()), Times.Once);
 
         }
 
@@ -68,14 +75,13 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
         {
             string pokemonName = "exception";
 
-            var mockPokedexService = new Mock<IPokedexService>();
-            mockPokedexService.Setup(a => a.GetPokemon(pokemonName)).ThrowsAsync(new Exception("generic exception"));
+            _pokedexServiceMock.Setup(a => a.GetPokemon(pokemonName, It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("generic exception"));
 
-            PokedexController controller = new(mockPokedexService.Object, new Mock<IFunPokedexService>().Object, MockedLogger);
+            PokedexController controller = new(_pokedexServiceMock.Object, new Mock<IFunPokedexService>().Object, MockedLogger);
 
             // unexpected errors are not manage by controller
-            await Assert.ThrowsAnyAsync<Exception>(() => controller.GetPokemon(pokemonName));
-            mockPokedexService.Verify(a => a.GetPokemon(pokemonName), Times.Once);
+            await Assert.ThrowsAnyAsync<Exception>(() => controller.GetPokemon(pokemonName, _token));
+            _pokedexServiceMock.Verify(a => a.GetPokemon(pokemonName, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -91,15 +97,14 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
 
             string funDescription = "Funny description";
 
-            var mockPokedexService = new Mock<IPokedexService>();
-            mockPokedexService.Setup(a => a.GetPokemon(pokemon.Name)).ReturnsAsync(PokedexResult<Pokemon>.Success(pokemon));
+            _pokedexServiceMock.Setup(a => a.GetPokemon(pokemon.Name, It.IsAny<CancellationToken>())).ReturnsAsync(PokedexResult<Pokemon>.Success(pokemon));
 
             var mockFunPokedexService = new Mock<IFunPokedexService>();
-            mockFunPokedexService.Setup(a => a.GetFunDescription(It.IsAny<Pokemon>())).ReturnsAsync(PokedexResult<string>.Success(funDescription));
+            mockFunPokedexService.Setup(a => a.GetFunDescription(It.IsAny<Pokemon>(), It.IsAny<CancellationToken>())).ReturnsAsync(PokedexResult<string>.Success(funDescription));
 
-            PokedexController controller = new(mockPokedexService.Object, mockFunPokedexService.Object, MockedLogger);
+            PokedexController controller = new(_pokedexServiceMock.Object, mockFunPokedexService.Object, MockedLogger);
 
-            var response = await controller.GetPokemonTranslated(pokemon.Name);
+            var response = await controller.GetPokemonTranslated(pokemon.Name, _token);
             Assert.NotNull(response.Value);
             Assert.IsType<PokemonDto>(response.Value);
 
@@ -108,21 +113,20 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
             Assert.Equal(pokemon.Habitat, response.Value.Habitat);
             Assert.Equal(pokemon.IsLegendary, response.Value.IsLegendary);
 
-            mockPokedexService.Verify(a => a.GetPokemon(pokemon.Name), Times.Once);
-            mockFunPokedexService.Verify(a => a.GetFunDescription(It.IsAny<Pokemon>()), Times.Once);
+            _pokedexServiceMock.Verify(a => a.GetPokemon(pokemon.Name, It.IsAny<CancellationToken>()), Times.Once);
+            mockFunPokedexService.Verify(a => a.GetFunDescription(It.IsAny<Pokemon>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task GetPokemonTranslated_PockemonNotFound()
         {
             string pokemonName = "not-exists";
-            var mockPokedexService = new Mock<IPokedexService>();
-            mockPokedexService.Setup(a => a.GetPokemon(pokemonName)).ReturnsAsync(PokedexResult<Pokemon>.Fail("not found", FailureType.NotFound));
+            _pokedexServiceMock.Setup(a => a.GetPokemon(pokemonName, It.IsAny<CancellationToken>())).ReturnsAsync(PokedexResult<Pokemon>.Fail("not found", FailureType.NotFound));
 
             var mockFunPokedexService = new Mock<IFunPokedexService>();
 
-            PokedexController controller = new(mockPokedexService.Object, mockFunPokedexService.Object, MockedLogger);
-            var response = await controller.GetPokemonTranslated(pokemonName);
+            PokedexController controller = new(_pokedexServiceMock.Object, mockFunPokedexService.Object, MockedLogger);
+            var response = await controller.GetPokemonTranslated(pokemonName, _token);
 
             Assert.IsType<NotFoundObjectResult>(response.Result);
             Assert.IsType<ErrorDto>(((NotFoundObjectResult)response.Result).Value);
@@ -130,8 +134,8 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
             var dto = (ErrorDto)((NotFoundObjectResult)response.Result).Value!;
             Assert.Equal("100", dto.Code);
 
-            mockPokedexService.Verify(a => a.GetPokemon(pokemonName), Times.Once);
-            mockFunPokedexService.Verify(a => a.GetFunDescription(It.IsAny<Pokemon>()), Times.Never);
+            _pokedexServiceMock.Verify(a => a.GetPokemon(pokemonName, It.IsAny<CancellationToken>()), Times.Once);
+            mockFunPokedexService.Verify(a => a.GetFunDescription(It.IsAny<Pokemon>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -145,15 +149,14 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
                 IsLegendary = true,
             };
 
-            var mockPokedexService = new Mock<IPokedexService>();
-            mockPokedexService.Setup(a => a.GetPokemon(pokemon.Name)).ReturnsAsync(PokedexResult<Pokemon>.Success(pokemon));
+            _pokedexServiceMock.Setup(a => a.GetPokemon(pokemon.Name, It.IsAny<CancellationToken>())).ReturnsAsync(PokedexResult<Pokemon>.Success(pokemon));
 
             var mockFunPokedexService = new Mock<IFunPokedexService>();
-            mockFunPokedexService.Setup(a => a.GetFunDescription(It.IsAny<Pokemon>())).ReturnsAsync(PokedexResult<string>.Fail("not found", FailureType.NotFound));
+            mockFunPokedexService.Setup(a => a.GetFunDescription(It.IsAny<Pokemon>(), It.IsAny<CancellationToken>())).ReturnsAsync(PokedexResult<string>.Fail("not found", FailureType.NotFound));
 
-            PokedexController controller = new(mockPokedexService.Object, mockFunPokedexService.Object, MockedLogger);
+            PokedexController controller = new(_pokedexServiceMock.Object, mockFunPokedexService.Object, MockedLogger);
 
-            var response = await controller.GetPokemonTranslated(pokemon.Name);
+            var response = await controller.GetPokemonTranslated(pokemon.Name, _token);
             Assert.NotNull(response.Value);
             Assert.IsType<PokemonDto>(response.Value);
 
@@ -162,8 +165,8 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
             Assert.Equal(pokemon.Habitat, response.Value.Habitat);
             Assert.Equal(pokemon.IsLegendary, response.Value.IsLegendary);
 
-            mockPokedexService.Verify(a => a.GetPokemon(pokemon.Name), Times.Once);
-            mockFunPokedexService.Verify(a => a.GetFunDescription(It.IsAny<Pokemon>()), Times.Once);
+            _pokedexServiceMock.Verify(a => a.GetPokemon(pokemon.Name, It.IsAny<CancellationToken>()), Times.Once);
+            mockFunPokedexService.Verify(a => a.GetFunDescription(It.IsAny<Pokemon>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -177,20 +180,18 @@ namespace FunPokedex.Test.FunPokedex.Api.Controllers
                 IsLegendary = true,
             };
 
-            var mockPokedexService = new Mock<IPokedexService>();
-
-            mockPokedexService.Setup(a => a.GetPokemon(pokemon.Name)).ReturnsAsync(PokedexResult<Pokemon>.Success(pokemon));
+            _pokedexServiceMock.Setup(a => a.GetPokemon(pokemon.Name, It.IsAny<CancellationToken>())).ReturnsAsync(PokedexResult<Pokemon>.Success(pokemon));
 
             var mockFunPokedexService = new Mock<IFunPokedexService>();
-            mockFunPokedexService.Setup(a => a.GetFunDescription(It.IsAny<Pokemon>())).ThrowsAsync(new Exception("internal service error"));
+            mockFunPokedexService.Setup(a => a.GetFunDescription(It.IsAny<Pokemon>(), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("internal service error"));
 
-            PokedexController controller = new(mockPokedexService.Object, mockFunPokedexService.Object, MockedLogger);
+            PokedexController controller = new(_pokedexServiceMock.Object, mockFunPokedexService.Object, MockedLogger);
 
             // unexpected errors are not manage by controller
-            await Assert.ThrowsAnyAsync<Exception>(() => controller.GetPokemonTranslated(pokemon.Name));
+            await Assert.ThrowsAnyAsync<Exception>(() => controller.GetPokemonTranslated(pokemon.Name, _token));
 
-            mockPokedexService.Verify(a => a.GetPokemon(pokemon.Name), Times.Once);
-            mockFunPokedexService.Verify(a => a.GetFunDescription(It.IsAny<Pokemon>()), Times.Once);
+            _pokedexServiceMock.Verify(a => a.GetPokemon(pokemon.Name, It.IsAny<CancellationToken>()), Times.Once);
+            mockFunPokedexService.Verify(a => a.GetFunDescription(It.IsAny<Pokemon>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
 
