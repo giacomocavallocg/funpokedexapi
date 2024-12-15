@@ -34,7 +34,7 @@ namespace FunPokedex.Api.Controllers
             };
         }
 
-        [HttpGet("/translated/{pokemonName}")]
+        [HttpGet("translated/{pokemonName}")]
         public async Task<ActionResult<PokemonDto>> GetPokemonTranslated([BindRequired, FromRoute] string pokemonName, CancellationToken cancellationToken)
         {
             PokedexResult<Pokemon> result = await _pokedexService.GetPokemon(pokemonName, cancellationToken);
