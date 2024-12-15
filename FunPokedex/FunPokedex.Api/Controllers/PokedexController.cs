@@ -31,7 +31,6 @@ namespace FunPokedex.Api.Controllers
                 Description = pokemon.Description,
                 Habitat = pokemon.Habitat,
                 IsLegendary = pokemon.IsLegendary,
-                HasFunDescription = false,
             };
         }
 
@@ -53,7 +52,6 @@ namespace FunPokedex.Api.Controllers
                 Description = funTraslation.IsSuccess ? funTraslation.GetValueOrThrow() : pokemon.Description,
                 Habitat = pokemon.Habitat,
                 IsLegendary = pokemon.IsLegendary,
-                HasFunDescription = funTraslation.IsSuccess,
             };
         }
 

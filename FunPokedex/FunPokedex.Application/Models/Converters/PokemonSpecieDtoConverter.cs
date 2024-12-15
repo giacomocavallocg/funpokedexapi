@@ -43,7 +43,7 @@ namespace FunPokedex.Application.Models.Converters
 
         private static string? GetHabitat(JToken? habitatToken)
         {
-            if (habitatToken == null) return null;
+            if (habitatToken == null || !habitatToken.HasValues) return null;
 
             if (habitatToken is JObject habitatObject)
             {
@@ -55,7 +55,7 @@ namespace FunPokedex.Application.Models.Converters
 
         private static List<PokemonSpecieTextDto> GetTexts(JToken? textsToken)
         {
-            if (textsToken == null) return [];
+            if (textsToken == null || !textsToken.HasValues) return [];
 
             if (textsToken is JArray textsArray)
             {

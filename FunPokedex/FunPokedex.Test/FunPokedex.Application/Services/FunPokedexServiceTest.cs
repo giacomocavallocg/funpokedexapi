@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FunPokedex.Application.Interfaces;
 using FunPokedex.Application.Models;
 using FunPokedex.Application.Services;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
 
 namespace FunPokedex.Tests.FunPokedex.Application.Services
@@ -165,7 +166,9 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = false,
             };
 
-            await Assert.ThrowsAnyAsync<Exception>( () =>service.GetFunDescription(pokemon, _token));
+            var result = await service.GetFunDescription(pokemon, _token);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(pokemon.Description, result.GetValueOrThrow());
 
             // shakspeare
             pokemon = new()
@@ -176,8 +179,9 @@ namespace FunPokedex.Tests.FunPokedex.Application.Services
                 IsLegendary = false,
             };
 
-            await Assert.ThrowsAnyAsync<Exception>(() => service.GetFunDescription(pokemon, _token));
-
+            result = await service.GetFunDescription(pokemon, _token);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(pokemon.Description, result.GetValueOrThrow());
         }
 
         [Fact]

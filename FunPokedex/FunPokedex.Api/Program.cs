@@ -1,5 +1,5 @@
+
 using System.Net;
-using System.Reflection.Metadata.Ecma335;
 using FunPokedex.Api.Exceptions;
 using FunPokedex.Application.Infrastructure;
 using FunPokedex.Application.Interfaces;
@@ -7,7 +7,6 @@ using FunPokedex.Application.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Http.Resilience;
 using Polly;
-using Polly.CircuitBreaker;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,10 +29,18 @@ builder.Services.AddHttpClient<IPokeApi, PokeApi>(c =>
             SamplingDuration = TimeSpan.FromSeconds(10),
             FailureRatio = 0.2,
             MinimumThroughput = 3,
+            BreakDuration = TimeSpan.FromMinutes(1),
             ShouldHandle = static args =>
             {
-                bool shouldHandle = !args.Outcome.Result?.IsSuccessStatusCode ?? true;
-                return ValueTask.FromResult(shouldHandle);
+                if (args.Outcome.Exception != null) return ValueTask.FromResult(true);
+
+                if (args.Outcome.Result != null &&
+                (args.Outcome.Result.StatusCode == HttpStatusCode.TooManyRequests || (int)args.Outcome.Result.StatusCode >= 500))
+                {
+                    // status code >= 500 or 429
+                    return ValueTask.FromResult(true);
+                }
+                return ValueTask.FromResult(false);
             },
         });
     });
@@ -51,10 +58,18 @@ builder.Services.AddHttpClient<IFunTranslationsApi, FunTranslationApi>(c =>
             SamplingDuration = TimeSpan.FromSeconds(10),
             FailureRatio = 0.2,
             MinimumThroughput = 3,
+            BreakDuration = TimeSpan.FromMinutes(1),
             ShouldHandle = static args =>
             {
-                bool shouldHandle = !args.Outcome.Result?.IsSuccessStatusCode ?? true;
-                return ValueTask.FromResult(shouldHandle);
+                if (args.Outcome.Exception != null) return ValueTask.FromResult(true);
+
+                if (args.Outcome.Result != null &&
+                (args.Outcome.Result.StatusCode == HttpStatusCode.TooManyRequests || (int)args.Outcome.Result.StatusCode >= 500))
+                {
+                    // status code >= 500 or 429
+                    return ValueTask.FromResult(true);
+                }
+                return ValueTask.FromResult(false);
             },
         });
     });
