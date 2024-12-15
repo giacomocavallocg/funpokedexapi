@@ -152,7 +152,7 @@ In case of an error, the API returns an object of type `ErrorDto`.
 }
 ```
 
-## Gestione degli errori
+## Error Handling
 
 In the application, errors are handled with the following logic:
 
@@ -161,7 +161,7 @@ In the application, errors are handled with the following logic:
 
 All errors, both expected and unexpected, are tracked with a unique error code.
 
-## Note ed ulteriori sviluppi
+## Notes and Future Developments
 
 The goal was to create an application that is reliable and maintainable, with the aim of having a product close to being ready for production. However, due to time constraints, some aspects were left out, including:
 
